@@ -1,5 +1,23 @@
+const hashName = window.location.hash;
+
 function random(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
+}
+
+function delay(time) {
+    return new Promise(resolve => setTimeout(() => resolve(), time));
+}
+
+function show(element) {
+    element.classList.add("visible");
+    element.classList.remove("hidden");
+    return delay(1000);
+}
+
+function hide(element) {
+    element.classList.add("hidden");
+    element.classList.remove("visible");
+    return delay(1000);
 }
 
 class Replices {
@@ -36,69 +54,45 @@ function play(replica) {
     return replices.play(replica);
 }
 
-var recognition = new webkitSpeechRecognition();
-recognition.lang = "ru-RU";
-recognition.continuous = true;
-recognition.onstart = function () {
-    document.querySelector("#micro").src = "/img/audio.svg"
-}
-
-recognition.onend = function () {
-    document.querySelector("#micro").src = "/img/mute.svg"
-}
-
-function listen(timeout) {
-    recognition.start();
-    return new Promise(resolve => {
-        const a = setTimeout(() => {
-            recognition.stop();
-            resolve(null);
-        }, timeout)
-        recognition.onresult = (event) => {
-            clearTimeout(a);
-            recognition.stop();
-            const text = event.results[0][0].transcript.split(' ')[0];
-            console.log(text);
-            resolve(text);
-        }
-    })
-}
-
-const allowNames = [
-    "Кристина",
-    "Лена",
-    "Наташа",
-    "Даша",
-    "Таня",
-]
-
-const alias = ["Лапочка", "Красотулечка", "Котеночек"];
-
 class Man {
-    constructor() {
-        this.manSrc = `img/man${random(0, 12)}.jpg`;
-        this.alias = alias[random(0, 3)];
+    async show() {
+        const img = await this.showMan();
+        const name = this.getName();
+
+        if (!name || !await this.congratulate(name)) {
+            await play(`save${random(0, 3)}`)
+        }
+        await this.hideMan(img)
     }
 
-    async show() {
-        this.showMan();
-        const name = await this.getName();
+    async congratulate(name) {
         try {
             const [text, _] = await Promise.all([this.createCongratulation(name), play("prepare")]);
-            this.typeMessage(text);
-            await this.playCongratulation(name);
-        } catch {
-            await play(`save${random(0, 3)}`)
+            const [message] = await Promise.all([this.pushText(text), this.playCongratulation(name)]);
+            await delay(2000);
+            await this.hideText(message);
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
         }
     }
 
     showMan() {
-        const mans = document.querySelector(".mans");
+        const container = document.querySelector(".container");
         const img = document.createElement('img');
-        img.src = this.manSrc;
+        img.src = `img/man${random(0, 12)}.jpg`;;
         img.classList.add("man");
-        mans.appendChild(img);
-        setTimeout(() => img.classList.add("visible"), 10);
+        img.classList.add("hidden");
+        container.appendChild(img);
+        setTimeout(() => show(img))
+        return img;
+    }
+
+    async hideMan(img) {
+        const container = document.querySelector(".container");
+        await hide(img)
+        container.removeChild(img)
     }
 
     async createCongratulation(name) {
@@ -123,62 +117,42 @@ class Man {
         })
     }
 
-    async getName() {
-        await play("whatIsYourName")
-        let name = null;
-        let tryCount = 0;
-        while (name == null && tryCount < 3) {
-            const words = await listen(5000);
-            if (!words) {
-                await play(`wait${random(0, 3)}`)
-                continue;
-            }
-
-            const findedName = allowNames.find(x => x === words);
-
-            if (findedName) {
-                name = findedName;
-                break;
-            }
-
-            tryCount += 1;
-
-            if (tryCount === 3) {
-                break;
-            }
-
-            if (words.length > 10) {
-                await play("ofical");
-            } else {
-                await play("repeat");
-            }
+    getName() {
+        const hash = window.location.hash;
+        if (hash) {
+            const alias = atob(hash.substring(1));
+            return women[alias];
         }
 
-        if (name) {
-            return name;
-        }
-        await play(this.alias);
-        return this.alias;
+        return null;
     }
 
-    typeMessage(text) {
-        const container = document.querySelector(".messageContainer");
-        if (container.firstChild) {
-            container.removeChild(container.firstChild);
-        }
-        const message = document.createElement("div");
-        message.classList.add("message");
+    async pushText(text) {
+        const message = document.querySelector(".message");
         message.textContent = text;
-        container.appendChild(message);
+        message.classList.add("swim");
+        await show(message);
+        return message;
+    }
+
+    async hideText(message) {
+        await hide(message);
+        message.classList.remove("swim");
+        message.textContent = "";
     }
 }
 
 async function start() {
-    document.querySelector(".start").classList.remove("visible");
+    window.playButton.onclick = null;
+    hide(document.querySelector(".start"));
     const man = new Man(random(0, 5));
-    man.show();
+    await man.show();
+    show(document.querySelector(".start"))
+    window.playButton.onclick = start;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector(".start").classList.add("visible");
+    window.playButton = document.querySelector(".start");
+    show(window.playButton);
+    window.playButton.onclick = start;
 })

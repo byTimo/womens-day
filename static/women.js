@@ -1,0 +1,22 @@
+const women = {
+    anastasiya: "Настя",
+    anna: "Аня",
+    vera: "Вера",
+    viktoria: "Вика",
+    daria: "Даша",
+    elena: "Лена",
+    irina: "Ирина",
+    kristina: "Кристина",
+    valeria: "Лера",
+    lubov: "Люба",
+    margarita: "Рита",
+    maria: "Маша",
+    nadezhda: "Надя",
+    natalya: "Наташа",
+    polina: "Полина",
+    svetlana: "Света",
+    sona: "Сона",
+    tatyana: "Таня",
+    julia: "Юля",
+    yana: "Яна"
+}

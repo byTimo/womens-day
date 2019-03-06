@@ -91,7 +91,7 @@ def create_app():
     app.config["private_key_path"] = settings['private_key_path']
     app.config['db'] = dict()
 
-    @app.route('/')
+    @app.route("/")
     def index():
         return send_file("static/index.html")
 
@@ -122,6 +122,7 @@ def create_app():
 
         if request.method == 'GET':
             voice = app.config['db'][name][2]
+            del app.config['db'][name]
             response = make_response(voice)
             response.headers.set('Content-Type', 'audio/ogg;codecs=opus')
             return response
