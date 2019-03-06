@@ -20,6 +20,19 @@ function hide(element) {
     return delay(1000);
 }
 
+const saveTexts = {
+    "save0": "От всего сердца поздравляю тебя с международным женским днём! Пусть всё вокруг играет яркими красками и пусть дни будут светлыми и безоблачными! Всегда подавай пример окружающим и не бойся никаких преград! Будь всегда счастливой, жизнерадостной и лучшей на свете!",
+    "save1": "Прими мои самые искренние поздравления с 8-м марта! Пусть любой твой день будет радостным и пусть всё вокруг играет яркими красками! Будь всегда разумной, рассудительной и целеустремлённой! Желаю тебе поменьше грустить и никогда не унывать!",
+    "save2": "От всего сердца поздравляю тебя с международным женским днём! Пусть весенние лучи, пробиваясь сквозь облака, укажут тебе путь к счастью и пусть всегда будет возможность заниматься любимыми делами! Желаю тебе радости, веселья и чтобы вокруг были хорошие люди!",
+    "save3": "Искренне поздравляю тебя с международным женским днём! Всегда оставайся столь же неотразимой, как и сегодня! Будь всегда щедрой, неотразимой и нежной! Желаю тебе хороших событий, а также множества интересных и радостных встреч!",
+    "save4": "Прими мои самые искренние поздравления с 8-м марта! Желаю тебе хороших впечатлений, а также успеха во всех сферах жизни! Пусть во всех твоих делах помогает ангел-хранитель! Всегда оставайся привлекательной и жизнерадостной красавицей!",
+    "save5": "Поздравляю тебя с праздником прекрасной половины человечества! Желаю тебе заниматься только тем, что приносит радость! Всегда оставайся такой же милой, нежной, юной! Будь всегда щедрой, жизнерадостной и здоровой!",
+    "save6": "Сердечно поздравляю тебя с международным женским днём! Пусть во всех твоих делах помогает ангел-хранитель, пусть любые начинания сопровождаются удачей и пусть судьба будет благосклонна к тебе и балует приятными сюрпризами! Будь всегда счастливой, полной оптимизма и непревзойдённой!",
+    "save7": "Прими мои самые искренние поздравления с 8-м марта! Пусть во всех твоих делах помогает ангел-хранитель и пусть твоя красота делает мир лучше и удивительнее! Желаю тебе творческих свершений, а также достижения новых вершин!",
+    "save8": "Прими мои самые искренние поздравления с 8-м марта! Сбереги на всю жизнь свою красоту и молодость! Желаю тебе достатка во всём, а также непрерывного праздника в душе! Будь всегда ласковой, счастливой и нежной!",
+    "save9": "Сердечно поздравляю тебя с международным женским днём! Желаю тебе тепла, бодрости, веселья и процветания! Пусть жизнь играет лишь по твоим правилам, пусть дни будут светлыми и безоблачными и пусть тебе везёт во всех делах!"
+}
+
 class Replices {
     constructor() {
         this.whatIsYourName = document.querySelector("#whatIsYourName");
@@ -29,9 +42,16 @@ class Replices {
         this['Котеночек'] = document.querySelector("#kitty");
         this.ofical = document.querySelector("#ofical");
         this.prepare = document.querySelector("#prepare");
+        this.save0 = document.querySelector("#save0");
         this.save1 = document.querySelector("#save1");
         this.save2 = document.querySelector("#save2");
         this.save3 = document.querySelector("#save3");
+        this.save4 = document.querySelector("#save4");
+        this.save5 = document.querySelector("#save5");
+        this.save6 = document.querySelector("#save6");
+        this.save7 = document.querySelector("#save7");
+        this.save8 = document.querySelector("#save8");
+        this.save9 = document.querySelector("#save9");
         this.wait1 = document.querySelector("#wait1");
         this.wait2 = document.querySelector("#wait2");
         this.wait0 = document.querySelector("#wait0");
@@ -60,7 +80,7 @@ class Man {
         const name = this.getName();
 
         if (!name || !await this.congratulate(name)) {
-            await play(`save${random(0, 3)}`)
+            await this.playSave()
         }
         await this.hideMan(img)
     }
@@ -78,14 +98,22 @@ class Man {
         }
     }
 
-    showMan() {
+    async playSave() {
+        const saveId = `save${random(0, 10)}`;
+        const text = saveTexts[saveId];
+        const [message] = await Promise.all([this.pushText(text), play(saveId)]);
+        await this.hideText(message);
+    }
+
+    async showMan() {
         const container = document.querySelector(".container");
         const img = document.createElement('img');
         img.src = `img/man${random(0, 12)}.jpg`;;
         img.classList.add("man");
         img.classList.add("hidden");
         container.appendChild(img);
-        setTimeout(() => show(img))
+        await delay(10);
+        await show(img)
         return img;
     }
 
