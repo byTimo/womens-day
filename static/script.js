@@ -89,7 +89,6 @@ class Man {
         try {
             const [text, _] = await Promise.all([this.createCongratulation(name), play("prepare")]);
             const [message] = await Promise.all([this.pushText(text), this.playCongratulation(name)]);
-            await delay(2000);
             await this.hideText(message);
             return true;
         } catch (error) {
@@ -108,7 +107,7 @@ class Man {
     async showMan() {
         const container = document.querySelector(".container");
         const img = document.createElement('img');
-        img.src = `img/man${random(0, 12)}.jpg`;;
+        img.src = `img/man${random(0, 19)}.jpg`;;
         img.classList.add("man");
         img.classList.add("hidden");
         container.appendChild(img);
