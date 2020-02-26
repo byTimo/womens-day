@@ -88,7 +88,7 @@ class Man {
     async congratulate(name) {
         try {
             const [text, _] = await Promise.all([this.createCongratulation(name), play("prepare")]);
-            const [message] = await Promise.all([this.pushText(text), this.playCongratulation(name)]);
+            const [message] = await Promise.all([this.pushText(text), this.playCongratulation(text)]);
             await delay(2000);
             await this.hideText(message);
             return true;
@@ -132,10 +132,10 @@ class Man {
         }
     }
 
-    playCongratulation(name) {
+    playCongratulation(text) {
         return new Promise(resolve => {
             const audio = document.createElement("audio");
-            audio.src = `/congratulation?name=${name}`;
+            audio.src = `/congratulation?text=${text}`;
             audio.autoplay = true;
             audio.onended = () => {
                 document.body.removeChild(audio);

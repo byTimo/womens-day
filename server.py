@@ -59,7 +59,6 @@ def synthesize(text, iam_token, folder_id):
 
     data = {
         'text': text,
-        'voice': 'ermil',
         'emotion': 'good',
         'folderId': folder_id,
         'spead': "0.1"
@@ -118,20 +117,13 @@ def create_app():
 
     @app.route('/congratulation', methods=["GET", "POST"])
     def congratulation():
-        name = request.args.get('name')
+        if request.method == 'POST':
+            name = request.args.get('name')
+            congratulation = get_congratulation()
+            text = "! ".join([name, congratulation])
+            return text
 
-        if request.method == 'GET':
-            voice = app.config['db'][name][2]
-            del app.config['db'][name]
-            response = make_response(voice)
-            response.headers.set('Content-Type', 'audio/ogg;codecs=opus')
-            return response
-
-        if name in app.config['db']:
-            return app.config['db'][name][1]
-
-        congratulation = get_congratulation()
-        text = "! ".join([name, congratulation])
+        text = request.args.get('text')
 
         if 'iam_token' not in app.config:
             print('not in g')
@@ -148,7 +140,11 @@ def create_app():
             app.config['folder_id']
         )
 
-        app.config['db'][name] = (name, text, voice)
-        return text
+        response = make_response(voice)
+        response.headers.set('Content-Type', 'audio/ogg;codecs=opus')
+        return response
 
     return app
+
+if __name__ == "__main__":
+    create_app().run(host='0.0.0.0', port="80")

@@ -18,5 +18,6 @@ const women = {
     sona: "Сона", //c29uYQ==
     tatyana: "Таня", //dGF0eWFuYQ==
     julia: "Юля", //anVsaWE=
-    yana: "Яна" //eWFuYQ==
+    yana: "Яна", //eWFuYQ==
+    nina: "Нина"
 }
