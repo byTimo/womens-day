@@ -142,7 +142,7 @@ def create_app():
 
         if 'iam_token' not in app.config:
             print('not in g')
-            private_key = get_private_key(app.config['private_key_path'])
+            private_key = app.config("private_key")
             app.config['iam_token'] = get_iam_token(create_jwt_token(
                 private_key,
                 app.config['service_account_id'],
