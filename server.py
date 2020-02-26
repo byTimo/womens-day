@@ -3,6 +3,7 @@ from flask import Flask, make_response, g, request, send_file
 import requests
 import jwt
 import time
+import os
 
 CONGRATULATION_URL = 'http://pozdravlala.ru/gen'
 
@@ -73,6 +74,8 @@ def synthesize(text, iam_token, folder_id):
 
 
 def get_settings():
+    if not os.path.isfile("settings.json"):
+        return {}
     with open("settings.json", "r") as f:
         return json.load(f)
 
@@ -84,10 +87,10 @@ def create_app():
     app.config.from_mapping(
         SECRAT_KEY='dev',
     )
-    app.config["service_account_id"] = settings['service_account_id']
-    app.config["key_id"] = settings['key_id']
-    app.config["folder_id"] = settings['folder_id']
-    app.config["private_key_path"] = settings['private_key_path']
+    app.config["service_account_id"] = os.environ.get('service_account_id', settings['service_account_id'])
+    app.config["key_id"] = os.environ.get('key_id', settings['key_id'])
+    app.config["folder_id"] = os.environ.get("folder_id" ,settings['folder_id'])
+    app.config["private_key_path"] =  os.environ.get('private_key_path', settings['private_key_path'])
     app.config['db'] = dict()
 
     @app.route("/")
@@ -99,7 +102,7 @@ def create_app():
         text = request.args.get('text')
 
         if 'iam_token' not in app.config:
-            private_key = get_private_key(app.config['private_key_path'])
+            private_key = os.environ.get("private_key", get_private_key(app.config['private_key_path']))
             app.config['iam_token'] = get_iam_token(create_jwt_token(
                 private_key,
                 app.config['service_account_id'],
